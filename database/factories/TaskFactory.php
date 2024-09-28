@@ -19,7 +19,7 @@ class TaskFactory extends Factory
         return [
             'title' => implode(' ', fake()->words(3)),
             'status' => false,
-            'user_id' => random_int(1, 2)
+            'user_id' => random_int(1, 1)
         ];
     }
 }
