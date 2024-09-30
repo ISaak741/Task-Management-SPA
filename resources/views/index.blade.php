@@ -12,7 +12,10 @@
 </head>
 
 <body>
-
+    <nav>
+        <a href="/" link>home</a> <a href="/users" link>users</a>
+    </nav>
+    <main main-app></main>
 </body>
 
 </html>
