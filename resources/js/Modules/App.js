@@ -1,57 +1,92 @@
 import { HttpRequest } from "../Modules/HttpRequest";
 
 export class App {
-    constructor() {
-        this.csrfToken = document
+    HAS_INSTANCE = false;
+    static make() {
+        App.csrfToken = document
             .querySelector('meta[name="csrf-token"]')
             .getAttribute("content");
-        this.request = new HttpRequest(this.csrfToken);
+        App.token = localStorage.getItem("TOKEN");
+        App.request = new HttpRequest(App.csrfToken);
+        App.init();
+        App.HAS_INSTANCE = true;
     }
 
-    async login(user) {
-        const response = await this.request.post("/login", user);
-        this.request.setToken(response["token-api"]);
+    static async auth(user, auth = "login") {
+        const response = await App.request.post(`/${auth}`, user);
+        if (response.success) {
+            const token = response["token-api"];
+            App.setToken(token);
+        }
+
+        return response;
     }
 
-    async createTask(task) {
-        const response = await this.request.post("/tasks", task);
+    static async login(user) {
+        return await App.auth(user);
+    }
+
+    static async register(user) {
+        return await App.auth(user, "register");
+    }
+
+    static async logout() {
+        const response = await App.request.post("/logout");
+        if (response.success) App.removeToken();
+
+        return response;
+    }
+
+    static async createTask(task) {
+        const response = await App.request.post("/tasks", task);
         console.log(response);
     }
 
-    async getTask(task_id) {
-        const response = await this.request.get(`/tasks/${task_id}`);
+    static async getTask(task_id) {
+        const response = await App.request.get(`/tasks/${task_id}`);
         console.log(response);
     }
 
-    async getTasks() {
-        const response = await this.request.get(`/tasks`);
+    static async getTasks() {
+        const response = await App.request.get(`/tasks`);
         console.log(response);
     }
 
-    async deleteTask(task_id) {
-        const response = await this.request.delete(`/tasks/${task_id}`);
+    static async deleteTask(task_id) {
+        const response = await App.request.delete(`/tasks/${task_id}`);
         console.log(response);
     }
 
-    async updateTask(task_id, task) {
-        const response = await this.request.put(`/tasks/${task_id}`, task);
+    static async updateTask(task_id, task) {
+        const response = await App.request.put(`/tasks/${task_id}`, task);
         console.log(response);
     }
 
     static setToken(token) {
-        App.app.token = token;
+        localStorage.setItem("TOKEN", token);
+        App.token = token;
+        App.request.headers = {
+            ...App.request.headers,
+            Authorazation: `Bearer ${token}`,
+        };
+    }
+
+    static removeToken() {
+        localStorage.removeItem("TOKEN");
+        App.token = null;
+        App.request.headers = {
+            ...App.request.headers,
+            Authorazation: "",
+        };
     }
 
     static init() {
-        if (!App.hasAlreadyInstance) {
-            App.app = new App();
-            App.app.request.headers = {
+        if (!App.HAS_INSTANCE) {
+            App.request.headers = {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                "X-CSRF-TOKEN": App.app.csrfToken,
+                "X-CSRF-TOKEN": App.csrfToken,
             };
         }
-
-        return App.app;
     }
 }

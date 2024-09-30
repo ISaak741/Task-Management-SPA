@@ -30,12 +30,4 @@ export class HttpRequest {
     async delete(route, body = null) {
         return this.send("DELETE", route, body);
     }
-
-    setToken(tokenApi) {
-        this.token = tokenApi;
-        this.headers = {
-            ...this.headers,
-            Authorazation: `Bearer ${tokenApi}`,
-        };
-    }
 }

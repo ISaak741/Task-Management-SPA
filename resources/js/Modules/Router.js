@@ -1,48 +1,68 @@
+import { Home } from "../Routes/Home";
+import { Logout } from "../Routes/Logout";
+import { Login } from "../Routes/login";
+import { Register } from "../Routes/register";
+
 export class Router {
-    constructor() {
-        this.routes = [
+    HAS_INSTANCE = false;
+    static make() {
+        Router.HAS_INSTANCE = true;
+        Router.routes = [
             {
                 path: "/",
-                view: "<h1> hello from <span style='color red'> / </span>",
+                view: Register,
             },
             {
-                path: "/users",
-                view: "<h1> hello from <span style='color red'> users </span>",
+                path: "/logout",
+                view: Logout,
+            },
+            {
+                path: "/home",
+                view: Home,
+            },
+            {
+                path: "/login",
+                view: Login,
             },
         ];
 
-        this.init();
+        Router.init();
     }
 
-    navigateTo(route) {
+    static navigateTo(route) {
         history.pushState({}, "", route);
-        this.route();
+        Router.route();
     }
 
-    async route() {
+    static async route() {
         const routeName = location.pathname ?? "";
-        const matchedRoute = this.routes.find((r) => r.path === routeName);
+        let matchedRoute = Router.routes.find((r) => r.path === routeName);
 
-        if (!matchedRoute) matchedRoute = this.routes[0];
+        if (!matchedRoute) matchedRoute = Router.routes[0];
 
-        await this.execute(matchedRoute);
+        await Router.execute(matchedRoute);
     }
 
-    async execute(route) {
-        const mainApp = document.querySelector("[main-app]");
-        mainApp.innerHTML = route.view;
+    static async execute(route) {
+        const view = new route.view();
+        if (view.allowed()) view.render();
+        else view.redirect();
     }
 
-    async init() {
+    static async init() {
         document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll("[link]").forEach((link) => {
-                link.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    this.navigateTo(e.target.href);
-                });
+            Router.preventLinks();
+            Router.route();
+            window.onpopstate = Router.route;
+        });
+    }
+
+    static preventLinks() {
+        document.querySelectorAll("[link]").forEach((link) => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+                this.navigateTo(e.target.href);
             });
-            this.route();
-            window.onpopstate = this.route.bind(this);
         });
     }
 }
