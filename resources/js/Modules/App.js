@@ -8,34 +8,39 @@ export class App {
         this.request = new HttpRequest(this.csrfToken);
     }
 
-    async login(user) {
-        const response = await this.request.post("/login", user);
-        this.request.setToken(response["token-api"]);
+    static async login(user) {
+        return await App.auth(user);
     }
 
-    async createTask(task) {
-        const response = await this.request.post("/tasks", task);
-        console.log(response);
+    static async register(user) {
+        return await App.auth(user, "register");
     }
 
-    async getTask(task_id) {
-        const response = await this.request.get(`/tasks/${task_id}`);
-        console.log(response);
+    static async logout() {
+        const response = await App.request.post("/logout");
+        if (response.success) App.removeToken();
+
+        return response;
     }
 
-    async getTasks() {
-        const response = await this.request.get(`/tasks`);
-        console.log(response);
+    static async createTask(task) {
+        return await App.request.post("/tasks", task);
     }
 
-    async deleteTask(task_id) {
-        const response = await this.request.delete(`/tasks/${task_id}`);
-        console.log(response);
+    static async getTask(task_id) {
+        return await App.request.get(`/tasks/${task_id}`);
     }
 
-    async updateTask(task_id, task) {
-        const response = await this.request.put(`/tasks/${task_id}`, task);
-        console.log(response);
+    static async getTasks() {
+        return await App.request.get(`/tasks`);
+    }
+
+    static async deleteTask(task_id) {
+        return await App.request.delete(`/tasks/${task_id}`);
+    }
+
+    static async updateTask(task_id, task) {
+        return await App.request.put(`/tasks/${task_id}`, task);
     }
 
     static setToken(token) {
