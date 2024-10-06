@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> Frontend
 import { App } from "../Modules/App";
 import { Router } from "../Modules/Router";
 import { AbstractView } from "./Abstract";
@@ -15,6 +20,11 @@ export class Login extends AbstractView {
                 <div class="bg-white p-8 rounded-lg shadow-md w-96">
                     <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
                     <form action="#" method="POST" login>
+<<<<<<< HEAD
+=======
+                            <div error class="text-red-500 mb-3">
+                            </div>
+>>>>>>> Frontend
                             <div class="mb-4">
                                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                                 <input type="email" id="email" name="email" required email
@@ -55,7 +65,17 @@ export class Login extends AbstractView {
             const response = await App.login(userCredentials);
             if (response.success) {
                 this.redirect();
+<<<<<<< HEAD
+=======
+            } else {
+                document.querySelector("[error]").innerHTML =
+                    "email or password incorrect";
+>>>>>>> Frontend
             }
         });
     }
 }
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> Frontend

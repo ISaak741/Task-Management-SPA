@@ -5,6 +5,10 @@ export class HttpRequest {
     }
 
     async send(method, route, body = null) {
+        this.headers = {
+            ...this.headers,
+            Authorazation: `Bearer ${localStorage.getItem("TOKEN")}`,
+        };
         const request = await fetch(`${this.base_url}${route}`, {
             method,
             headers: this.headers,

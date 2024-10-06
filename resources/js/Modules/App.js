@@ -12,16 +12,6 @@ export class App {
         App.HAS_INSTANCE = true;
     }
 
-    static async auth(user, auth = "login") {
-        const response = await App.request.post(`/${auth}`, user);
-        if (response.success) {
-            const token = response["token-api"];
-            App.setToken(token);
-        }
-
-        return response;
-    }
-
     static async login(user) {
         return await App.auth(user);
     }
@@ -38,28 +28,23 @@ export class App {
     }
 
     static async createTask(task) {
-        const response = await App.request.post("/tasks", task);
-        console.log(response);
+        return await App.request.post("/tasks", task);
     }
 
     static async getTask(task_id) {
-        const response = await App.request.get(`/tasks/${task_id}`);
-        console.log(response);
+        return await App.request.get(`/tasks/${task_id}`);
     }
 
     static async getTasks() {
-        const response = await App.request.get(`/tasks`);
-        console.log(response);
+        return await App.request.get(`/tasks`);
     }
 
     static async deleteTask(task_id) {
-        const response = await App.request.delete(`/tasks/${task_id}`);
-        console.log(response);
+        return await App.request.delete(`/tasks/${task_id}`);
     }
 
     static async updateTask(task_id, task) {
-        const response = await App.request.put(`/tasks/${task_id}`, task);
-        console.log(response);
+        return await App.request.put(`/tasks/${task_id}`, task);
     }
 
     static setToken(token) {
