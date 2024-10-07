@@ -35,35 +35,29 @@ export class Home extends AbstractView {
                         class="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300" />
                 </div>
                 <button type="submit"
-                    class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">Login
+                    class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    task-btn>Create
                 </button>
             </form>
         `;
 
         this.fetchTasks();
     }
+
     assignEvent() {
         const button = document.querySelector("[add-task]");
         const modal = document.querySelector("[modal]");
         const body = document.querySelector("[--body--]");
         button.addEventListener("click", (e) => {
             e.stopPropagation();
+            this.update = false;
+            this.modal = null;
+            this.task = null;
             body.classList.remove("hidden");
             modal.classList.remove("hidden");
         });
 
-        modal.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const taskPayload = {
-                title: modal.querySelector("[title]").value,
-                status:
-                    Number.parseInt(modal.querySelector("[status]").value) > 0,
-            };
-
-            App.createTask(taskPayload).then((data) => {
-                this.redirect("/home");
-            });
-        });
+        modal.addEventListener("submit", this.manageTask.bind(this));
 
         window.addEventListener("click", (e) => {
             const target = e.target;
@@ -78,7 +72,6 @@ export class Home extends AbstractView {
         });
     }
     allowed() {
-        console.log("hello from if allowed");
         return App.token !== null;
     }
 
@@ -86,18 +79,71 @@ export class Home extends AbstractView {
         App.getTasks().then((tasks) => {
             const table = new Table(tasks.data);
             document.querySelector("[data-content]").innerHTML = table.render();
-            document.querySelectorAll("[action]").forEach((action) => {
-                const taskDelete = action.querySelector("[delete-id]");
-                taskDelete.addEventListener("click", async () => {
-                    await App.deleteTask(taskDelete.getAttribute("delete-id"));
-                    action.parentElement.remove();
-                });
-            });
+            this.taskManage();
         });
     }
 
+    deleteTask() {
+        const tasks = document.querySelectorAll("[delete-id]");
+        for (const task of tasks)
+            task.addEventListener("click", async () => {
+                await App.deleteTask(task.getAttribute("delete-id"));
+                this.redirect("/home");
+            });
+    }
+
+    editTask() {
+        const tasks = document.querySelectorAll("[edit-id]");
+        for (const task of tasks)
+            task.addEventListener("click", async () => {
+                const task_ = (await App.getTask(task.getAttribute("edit-id")))
+                    .data;
+
+                const body = document.querySelector("[--body--]");
+                const modal = document.querySelector("[modal]");
+
+                body.classList.remove("hidden");
+                modal.classList.remove("hidden");
+
+                modal.querySelector("[title]").value = task_.title;
+                modal.querySelector("[status]").value = task_.status;
+                this.update = true;
+                this.modal = modal;
+                this.task = task_;
+            });
+    }
+
+    manageTask(e) {
+        e.preventDefault();
+
+        const update = this.update;
+        const modal = this.modal;
+        const task = this.task;
+
+        let taskPayload = null;
+        let target = update ? modal : e.target;
+
+        taskPayload = {
+            title: target.querySelector("[title]").value,
+            status: Number.parseInt(target.querySelector("[status]").value) > 0,
+        };
+
+        if (update)
+            App.updateTask(task.id, taskPayload).then((data) => {
+                this.redirect("/home");
+            });
+        else
+            App.createTask(taskPayload).then((data) => {
+                this.redirect("/home");
+            });
+    }
+
+    taskManage() {
+        this.deleteTask();
+        this.editTask();
+    }
+
     redirect() {
-        console.log("redirecting ...");
         Router.navigateTo("/login");
     }
 }
