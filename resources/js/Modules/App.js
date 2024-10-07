@@ -8,6 +8,11 @@ export class App {
         this.request = new HttpRequest(this.csrfToken);
     }
 
+    static async auth(userPayload, route = "login") {
+        const response = await App.request.post(`/${route}`, userPayload);
+        if (response.success) App.setToken(response.token);
+        return response;
+    }
     static async login(user) {
         return await App.auth(user);
     }

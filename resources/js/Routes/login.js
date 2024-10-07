@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 import { App } from "../Modules/App";
 import { Router } from "../Modules/Router";
 import { AbstractView } from "./Abstract";
@@ -66,4 +64,3 @@ export class Login extends AbstractView {
         });
     }
 }
->>>>>>> Stashed changes
