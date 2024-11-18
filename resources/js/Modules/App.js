@@ -10,7 +10,7 @@ export class App {
 
     static async auth(userPayload, route = "login") {
         const response = await App.request.post(`/${route}`, userPayload);
-        if (response.success) App.setToken(response.token);
+        if (response.success) App.setToken(response["token-api"]);
         return response;
     }
     static async login(user) {
